@@ -22,9 +22,10 @@ import base64
 
 # --- Configuration ---
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'your_super_secret_key_here' # USE A STRONG, RANDOM KEY IN PRODUCTION
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'postgresql://postgres:Next@123@localhost:5432/finance_db'
+    SECRET_KEY = os.environ.get('SECRET_KEY', '9126982b866fbb4e7aa17f854f6a9b121804b61d50783e9aba4de044ddd60529')  # Use a strong, random key in production
+
+    # Only use DATABASE_URL from environment; fallback to sqlite for development if needed
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///dev.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG = os.environ.get('FLASK_DEBUG') == '1'
 
