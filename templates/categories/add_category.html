@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Add New Category{% endblock %}
+
+{% block content %}
+<div class="form-container fade-in-section"> {# Replaced Bootstrap grid/card with our custom form-container #}
+    <h2>Add New Category</h2> {# This H2 will pick up the form-container h2 style #}
+
+    {# Flash Messages - Using our custom flashes and alert classes #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flashes">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        <div class="form-group"> {# Replaced mb-3 with custom form-group #}
+            <label for="name">Category Name:</label> {# Custom label styling is applied via form-group label #}
+            <input type="text" class="form-control" id="name" name="name" required aria-label="Category name"> {# Custom form-control #}
+        </div>
+        <div class="form-group"> {# Replaced mb-3 with custom form-group #}
+            <label for="type">Category Type:</label>
+            <select class="form-control" id="type" name="type" required aria-label="Select category type"> {# Custom form-control for select #}
+                <option value="">Select Category Type</option>
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+            </select>
+            <p class="form-help-text">Categories help organize your transactions (e.g., "Groceries" for Expense, "Salary" for Income).</p> {# Replaced form-text with custom form-help-text #}
+        </div>
+        <div class="form-buttons"> {# Replaced d-grid gap-2 with custom form-buttons #}
+            <button type="submit" class="button primary">Add Category</button> {# Custom primary button #}
+            <a href="{{ url_for('list_categories') }}" class="button secondary">Cancel</a> {# Custom secondary button #}
+        </div>
+    </form>
+</div>
+{% endblock %}

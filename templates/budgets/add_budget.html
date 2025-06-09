@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Set Budget{% endblock %}
+
+{# No need for an explicit {% block head %} unless you have unique <head> elements here #}
+{# that don't belong in base.html. super() is usually enough. #}
+
+{% block content %}
+    <div class="form-container"> {# Replaced Bootstrap container/card with our custom form-container #}
+        <h2>Set New Budget</h2> {# No need for specific header classes, h2 in form-container handles it #}
+
+        {# Flash Messages - Using our custom flashes and alert classes #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flashes">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('add_budget') }}">
+            <div class="form-group"> {# Custom form-group #}
+                <label for="category_name">Category:</label> {# Custom form-label styling is applied via form-group label #}
+                <select class="form-control" id="category_name" name="category_name" required aria-label="Select a category for the budget"> {# Custom form-control #}
+                    <option value="">Select a Category</option>
+                    {% for category in categories %}
+                        <option value="{{ category.name }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+                {% if not categories %}
+                    {# Custom styling for the small text and link #}
+                    <p class="form-help-text text-danger mt-2">
+                        No expense categories found. Please <a href="{{ url_for('add_category') }}">add some categories</a> first.
+                    </p>
+                {% endif %}
+            </div>
+            <div class="form-group"> {# Custom form-group #}
+                <label for="amount">Budget Amount (₹):</label> {# Consistent styling, used actual rupee symbol #}
+                <input type="number" step="0.01" class="form-control" id="amount" name="amount" placeholder="e.g., 5000.00" required aria-label="Budget amount in rupees"> {# Custom form-control #}
+            </div>
+
+            <div class="form-group"> {# Custom form-group #}
+                <label for="start_date">Start Date:</label>
+                <input type="date" class="form-control" id="start_date" name="start_date" required aria-label="Budget start date" value="{{ today.strftime('%Y-%m-%d') if today else '' }}">
+            </div>
+            <div class="form-group"> {# Custom form-group #}
+                <label for="end_date">End Date (Optional):</label>
+                <input type="date" class="form-control" id="end_date" name="end_date" aria-label="Budget end date">
+            </div>
+
+            <div class="form-buttons"> {# New custom class for button alignment #}
+                <button type="submit" class="button primary">Set Budget</button> {# Custom button styling #}
+                <a href="{{ url_for('list_budgets') }}" class="button secondary">View My Budgets</a> {# Custom button styling #}
+            </div>
+        </form>
+    </div>
+{% endblock %}

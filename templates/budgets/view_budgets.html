@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}My Budgets{% endblock %}
+
+{% block head %}
+    {{ super() }} {# This line is important to include anything from base.html's head block #}
+{% endblock %}
+
+{% block content %}
+<div class="data-container"> {# New custom container for data display #}
+    <h2>My Budgets</h2> {# This H2 will pick up the styling from form-container h2, or we can make a specific data-container h2 style if needed #}
+
+    {# Flash Messages - Using our custom flashes and alert classes #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flashes">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% if budgets %}
+    <div class="table-responsive-wrapper"> {# New custom wrapper for responsive table #}
+        <table class="custom-table"> {# New custom table class #}
+            <caption class="table-caption">A summary of your current budgets.</caption> {# Custom caption class #}
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Budget Amount (₹)</th> {# Corrected Rupee symbol #}
+                    <th>Spent (₹)</th> {# Corrected Rupee symbol #}
+                    <th>Remaining (₹)</th> {# Corrected Rupee symbol #}
+                    <th>Start Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for budget in budgets %}
+                <tr>
+                    <td class="bold-text">{{ budget.category }}</td> {# Custom bold class #}
+                    <td>₹{{ "%.2f"|format(budget.amount | float) }}</td> {# Corrected Rupee symbol #}
+                    <td>₹{{ "%.2f"|format(budget.spent | float) }}</td> {# Corrected Rupee symbol #}
+                    <td class="{{ 'text-danger' if budget.remaining < 0 else 'text-success' }}">
+                        ₹{{ "%.2f"|format(budget.remaining | float) }} {# Corrected Rupee symbol #}
+                    </td>
+                    <td>{{ budget.start_date.strftime('%Y-%m-%d') }}</td>
+                    <td class="table-actions"> {# Custom class for button alignment in table #}
+                        <a href="{{ url_for('edit_budget', budget_id=budget.id) }}" class="button secondary button-sm">Edit</a> {# Custom button styling #}
+                        <form action="{{ url_for('delete_budget', budget_id=budget.id) }}" method="POST" style="display:inline-block;"> {# Changed to inline-block for better button spacing #}
+                            <button type="submit" class="button danger button-sm" onclick="return confirm('Are you sure you want to delete the budget for {{ budget.category }}?');">Delete</button> {# Custom button styling #}
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="empty-state-message">You haven't set any budgets yet. Click the button below to get started!</p> {# Custom class for message #}
+    {% endif %}
+    <div class="action-button-group"> {# New custom class for button alignment #}
+        <a href="{{ url_for('add_budget') }}" class="button primary">Set New Budget</a> {# Custom button styling #}
+    </div>
+</div>
+{% endblock %}

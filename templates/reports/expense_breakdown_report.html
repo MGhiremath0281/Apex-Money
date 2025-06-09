@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Expense Breakdown Report{% endblock %}
+
+{% block content %}
+<div class="report-container fade-in-section"> {# Added fade-in-section for consistency #}
+    <h2 class="report-title">Expense Breakdown Report</h2>
+
+    {# Month/Year Selection Form #}
+    <div class="report-card filter-card">
+        <div class="report-card-header">
+            <h5>Select Month & Year</h5>
+        </div>
+        <div class="report-card-body">
+            <form method="GET" action="{{ url_for('expense_breakdown_report') }}">
+                <div class="filter-form-grid">
+                    <div class="form-group">
+                        <label for="month_select">Month:</label>
+                        <select class="form-control" id="month_select" name="month">
+                            {% for i in range(1, 13) %}
+                                <option value="{{ i }}" {% if i == selected_month %}selected{% endif %}>
+                                    {{ (current_month.replace(day=1, month=i)).strftime('%B') }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="year_select">Year:</label>
+                        <select class="form-control" id="year_select" name="year">
+                            {% for year_val in range(current_year - 5, current_year + 2) %}
+                                <option value="{{ year_val }}" {% if year_val == selected_year %}selected{% endif %}>
+                                    {{ year_val }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-button-group">
+                        <button type="submit" class="button primary full-width">Apply Filter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {# Report Summary Card (Total Expenses) #}
+    {% if total_expenses is not none %} {# Only show if total_expenses is available #}
+    <div class="summary-report-grid-single"> {# New grid for a single summary card #}
+        <div class="summary-stat-card danger"> {# Reusing summary card style for expenses #}
+            <div class="summary-stat-header">Total Expenses ({{ current_month.strftime('%B %Y') }})</div>
+            <div class="summary-stat-body">
+                <div class="summary-stat-amount">₹{{ "{:,.2f}".format(total_expenses) }}</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Expense Breakdown Chart #}
+    <div class="chart-grid-single"> {# New grid for a single chart #}
+        <div class="report-card chart-card">
+            <div class="report-card-header">
+                <h5>Expense Distribution by Category</h5>
+            </div>
+            <div class="report-card-body chart-body"> {# Added chart-body class for specific chart padding #}
+                {% if expense_breakdown_chart_html %}
+                    {{ expense_breakdown_chart_html | safe }}
+                {% else %}
+                    <p class="empty-chart-message">No expense data for the selected month to display chart.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# Expense Breakdown Table #}
+    <div class="report-card table-card">
+        <div class="report-card-header">
+            <h5>Detailed Expense Breakdown ({{ current_month.strftime('%B %Y') }})</h5>
+        </div>
+        <div class="report-card-body">
+            {% if expense_breakdown_data %}
+            <div class="table-responsive-wrapper">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th class="text-right">Total Amount (₹)</th>
+                            <th class="text-right">Percentage (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in expense_breakdown_data %}
+                        <tr>
+                            <td>{{ item.category }}</td>
+                            <td class="text-right">₹{{ "{:,.2f}".format(item.total_amount) }}</td>
+                            <td class="text-right">{{ "{:,.2f}".format(item.percentage) }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="empty-state-message">No detailed expense data for the selected month.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

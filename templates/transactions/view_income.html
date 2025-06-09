@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}My Income{% endblock %}
+
+{% block content %}
+<div class="data-container fade-in-section"> {# Replaced Bootstrap container/row/col with our custom data-container #}
+    <h2 class="data-list-title">All My Income</h2> {# Re-using data-list-title #}
+
+    {# Flash Messages - Using our custom flashes and alert classes #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flashes">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% if income_transactions %} {# Note the variable name from the blueprint #}
+    <div class="table-responsive-wrapper"> {# Re-using custom wrapper for responsive tables #}
+        <table class="custom-table"> {# Re-using our custom table styling #}
+            <caption>A comprehensive list of all your recorded income.</caption> {# Caption is styled by custom-table caption #}
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th class="text-right">Amount (₹)</th> {# Re-using custom utility for right alignment #}
+                    <th class="text-center">Actions</th> {# Re-using custom utility for center alignment #}
+                </tr>
+            </thead>
+            <tbody>
+                {% for income_transaction in income_transactions %}
+                <tr>
+                    <td>{{ income_transaction.date.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ income_transaction.description }}</td>
+                    <td>{{ income_transaction.category.name }}</td>
+                    <td class="text-right font-bold text-success"> {# Re-using custom text colors, added font-bold #}
+                        ₹{{ "%.2f"|format(income_transaction.amount | float) }} {# Corrected Rupee symbol #}
+                    </td>
+                    <td class="text-center action-buttons-cell"> {# Re-using action-buttons-cell #}
+                        <a href="{{ url_for('edit_transaction', transaction_id=income_transaction.id) }}" class="button primary small">Edit</a> {# Custom button classes #}
+                        <form action="{{ url_for('delete_transaction', transaction_id=income_transaction.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this income record?');"> {# d-inline is fine #}
+                            <button type="submit" class="button danger small">Delete</button> {# Custom button classes #}
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="empty-state-message">No income recorded yet. Start by adding a new one!</p> {# Re-using empty state message #}
+    {% endif %}
+
+    <div class="bottom-action-buttons-group"> {# Re-using custom group for buttons at the bottom #}
+        <a href="{{ url_for('add_transaction', transaction_type='income') }}" class="button success large">Add New Income</a> {# Custom button classes, using 'success' and 'large' #}
+    </div>
+</div>
+{% endblock %}

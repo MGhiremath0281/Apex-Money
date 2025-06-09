@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to Personal Finance Manager{% endblock %}
+
+{% block content %}
+    <div class="welcome-section">
+        <h1 style="font-family: 'Edu VIC WA NT Hand', cursive;">Apex Money!</h1>
+        <p class="tagline">Take control of your money, simplify your life.</p>
+
+        <section class="about-app">
+            <h2>About Our Application</h2>
+            <p>Our Personal Finance Manager helps you track your income and expenses, set budgets, categorize your spending, and generate insightful reports. Whether you're saving for a goal, managing debt, or just want a clear picture of your financial health, we've got you covered.</p>
+            <p>Key features include:</p>
+            <ul>
+                <li>Easy Income and Expense Tracking</li>
+                <li>Customizable Categories</li>
+                <li>Flexible Budgeting Tools</li>
+                <li>Comprehensive Financial Reports</li>
+                <li>Secure User Authentication</li>
+                <li>Responsive</li>
+            </ul>
+            <p>Start your journey to financial freedom today!</p>
+        </section>
+
+        <div class="cta-buttons">
+            {% if not current_user.is_authenticated %}
+                <p>Ready to get started?</p>
+                <a href="{{ url_for('register') }}" class="button primary">Register Now</a>
+                <a href="{{ url_for('login') }}" class="button secondary">Log In</a>
+            {% else %}
+                <p>Welcome back, {{ current_user.username }}!</p>
+                <a href="{{ url_for('dashboard_page') }}" class="button primary">Go to Dashboard</a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

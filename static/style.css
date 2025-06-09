@@ -1,0 +1,1685 @@
+/* CSS Variables for Dark Mode Theme */
+:root {
+    --background-color: #1a1a2e;
+    --card-background: #16213e;
+    --text-color: #e0e0e0;
+    --heading-color: #e0e0e0;
+    --accent-color: #0f3460;
+    --primary-button-bg: #e94560;
+    --primary-button-hover-bg: #c93550;
+    --secondary-button-bg: #533483;
+    --secondary-button-hover-bg: #432a6a;
+    --border-color: #0f3460;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+
+    /* Header/Footer Specific */
+    --header-footer-bg: #0f3460;
+    --nav-link-color: #e0e0e0;
+    --nav-link-hover-color: #e94560;
+    --nav-shadow: rgba(0, 0, 0, 0.6);
+
+    /* Flash Message Colors */
+    --flash-success-bg: #28a745;
+    --flash-success-color: #ffffff;
+    --flash-error-bg: #dc3545;
+    --flash-error-color: #ffffff;
+    --flash-info-bg: #007bff;
+    --flash-info-color: #ffffff;
+    --flash-warning-bg: #ffc107;
+    --flash-warning-color: #343a40;
+}
+
+/* Base Styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+/* General Link Styling (if not part of a button) */
+a {
+    color: var(--primary-button-bg);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--primary-button-hover-bg);
+}
+
+/* --- Header Styling --- */
+header {
+    background: var(--header-footer-bg);
+    color: var(--nav-link-color);
+    padding: 15px 20px;
+    box-shadow: 0 4px 15px var(--nav-shadow);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid var(--border-color);
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+nav a {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    color: var(--nav-link-color);
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+nav a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, var(--primary-button-bg) 0%, var(--secondary-button-bg) 100%);
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    z-index: -1;
+}
+
+nav a:hover {
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+nav a:hover::before {
+    opacity: 1;
+    transform: scaleX(1);
+}
+
+/* --- Main Content Area --- */
+main {
+    flex-grow: 1;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Welcome Section Styling (from previous request) */
+.welcome-section {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    background: var(--card-background);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px var(--shadow-color);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.welcome-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at top left, var(--accent-color) 0%, transparent 40%),
+                radial-gradient(circle at bottom right, var(--secondary-button-bg) 0%, transparent 40%);
+    opacity: 0.1;
+    z-index: -1;
+    animation: rotateGradient 15s linear infinite;
+}
+
+@keyframes rotateGradient {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: var(--heading-color);
+    font-size: 2.8em;
+    margin-bottom: 15px;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(90deg, #e94560, #533483);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.tagline {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    font-size: 1.3em;
+    color: var(--text-color);
+    margin-bottom: 30px;
+}
+
+/* About Section */
+.about-app {
+    background-color: var(--accent-color);
+    padding: 25px;
+    border-radius: 10px;
+    margin-top: 30px;
+    text-align: left;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.about-app:hover {
+    transform: translateY(-5px);
+    box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.5), 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.about-app h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    color: var(--heading-color);
+    font-size: 2em;
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.about-app p {
+    margin-bottom: 15px;
+    color: var(--text-color);
+}
+
+.about-app ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 10px;
+}
+
+.about-app ul li {
+    background-color: var(--background-color);
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    border-left: 4px solid var(--primary-button-bg);
+}
+
+.about-app ul li:hover {
+    transform: translateX(5px);
+    background-color: #2b2b45;
+    border-left-color: var(--secondary-button-bg);
+}
+
+.about-app ul li::before {
+    content: '\1F680'; /* Corrected Unicode for rocket emoji */
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+
+/* Call to Action Buttons */
+.cta-buttons {
+    margin-top: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.cta-buttons p {
+    font-size: 1.1em;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.button {
+    display: inline-block;
+    padding: 15px 30px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    border: none;
+    text-align: center;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+    background-size: 200% 200%;
+}
+
+.button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.0) 50%, rgba(255,255,255,0.1) 100%);
+    transform: translateX(-100%);
+    transition: transform 0.4s ease-in-out;
+    z-index: 0;
+}
+
+.button:hover::before {
+    transform: translateX(100%);
+}
+
+.button.primary {
+    background-image: linear-gradient(45deg, var(--primary-button-bg) 0%, #ff6b6b 100%);
+    color: #ffffff;
+}
+
+.button.primary:hover {
+    background-position: 100% 0;
+    box-shadow: 0 12px 20px rgba(233, 69, 96, 0.5);
+    transform: translateY(-3px);
+}
+
+.button.secondary {
+    background-image: linear-gradient(45deg, var(--secondary-button-bg) 0%, #8d62ab 100%);
+    color: #ffffff;
+}
+
+.button.secondary:hover {
+    background-position: 100% 0;
+    box-shadow: 0 12px 20px rgba(83, 52, 131, 0.5);
+    transform: translateY(-3px);
+}
+
+/* --- Flash Messages Styling --- */
+.flashes {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    max-width: 600px;
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.alert {
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    animation: fadeInOut 0.5s ease-out forwards;
+}
+
+.alert-success {
+    background-color: var(--flash-success-bg);
+    color: var(--flash-success-color);
+}
+
+.alert-error, .alert-danger {
+    background-color: var(--flash-error-bg);
+    color: var(--flash-error-color);
+}
+
+.alert-info {
+    background-color: var(--flash-info-bg);
+    color: var(--flash-info-color);
+}
+
+.alert-warning {
+    background-color: var(--flash-warning-bg);
+    color: var(--flash-warning-color);
+}
+
+@keyframes fadeInOut {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) translateX(-50%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) translateX(-50%);
+    }
+}
+
+/* --- Footer Styling --- */
+footer {
+    background: var(--header-footer-bg);
+    color: var(--nav-link-color);
+    text-align: center;
+    padding: 20px;
+    margin-top: auto;
+    box-shadow: 0 -4px 15px var(--nav-shadow);
+    border-top: 1px solid var(--border-color);
+}
+
+footer p {
+    margin: 0;
+    font-size: 0.9em;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+    nav {
+        justify-content: flex-start;
+        gap: 15px;
+        padding: 0 10px;
+    }
+
+    nav a {
+        padding: 6px 12px;
+        font-size: 0.9em;
+    }
+
+    .welcome-section {
+        margin: 20px;
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    .tagline {
+        font-size: 1.1em;
+    }
+
+    .about-app h2 {
+        font-size: 1.8em;
+    }
+
+    .about-app ul {
+        grid-template-columns: 1fr;
+    }
+
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .button {
+        width: 80%;
+        padding: 12px 20px;
+        font-size: 1em;
+    }
+
+    .flashes {
+        width: 90%;
+        top: 70px;
+    }
+}
+
+@media (max-width: 480px) {
+    header {
+        padding: 10px 15px;
+    }
+
+    nav {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    nav a {
+        width: calc(100% - 30px);
+        text-align: left;
+        padding: 8px 15px;
+        font-size: 1em;
+    }
+
+    h1 {
+        font-size: 1.6em;
+    }
+
+    .tagline {
+        font-size: 1em;
+    }
+
+    .about-app p, .about-app ul li {
+        font-size: 0.9em;
+    }
+
+    .flashes {
+        top: 60px;
+        width: 95%;
+    }
+}
+/* --- Form Styling --- */
+.form-container {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 35px;
+    background: var(--card-background);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px var(--shadow-color);
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.form-container h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    color: var(--heading-color);
+    font-size: 2.2em;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.form-group {
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    color: var(--text-color);
+    font-size: 1.1em;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-family: 'Roboto', sans-serif;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.form-control:focus {
+    border-color: var(--primary-button-bg);
+    box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.3), inset 0 2px 5px rgba(0, 0, 0, 0.3);
+    outline: none;
+    background-color: #2a2a44; /* Slightly lighter on focus */
+}
+
+/* Specific styling for the paragraphs and links inside form-container */
+.form-container p {
+    color: var(--text-color);
+    font-size: 1em;
+    margin-top: 25px; /* Adjust as needed */
+}
+
+.form-container p a {
+    color: var(--primary-button-bg);
+    text-decoration: underline;
+}
+
+.form-container p a:hover {
+    color: var(--primary-button-hover-bg);
+}
+
+/* Utility classes for spacing, if you don't use a full CSS framework like Bootstrap */
+.mt-3 {
+    margin-top: 1rem !important; /* Adjust as needed, 1rem = 16px usually */
+}
+.mb-3 {
+    margin-bottom: 1rem !important;
+}
+
+/* Media Queries for Forms */
+@media (max-width: 768px) {
+    .form-container {
+        margin: 30px 20px;
+        padding: 25px;
+    }
+
+    .form-container h2 {
+        font-size: 1.8em;
+        margin-bottom: 25px;
+    }
+
+    .form-group label {
+        font-size: 1em;
+    }
+
+    .form-control {
+        padding: 10px 12px;
+        font-size: 0.95em;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-container {
+        margin: 20px 15px;
+        padding: 20px;
+    }
+
+    .form-container h2 {
+        font-size: 1.5em;
+        margin-bottom: 20px;
+    }
+}
+/* static/css/style.css */
+
+/* General Body and Main Content */
+body {
+    background-color: #9b9c9c; /* Lighter background for the entire app */
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* Modern font stack */
+}
+
+/* Custom styles for the card */
+.card-header {
+    border-bottom: none !important; /* Remove default card-header border */
+}
+
+/* Ensure consistent form element styling (Bootstrap handles most of this) */
+.form-label {
+    font-weight: 600; /* Slightly bolder labels */
+    color: #343a40; /* Darker grey for labels */
+}
+
+.form-control,
+.form-select {
+    border-radius: .4rem; /* Slightly more rounded inputs/selects */
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 .25rem rgba(0, 123, 255, .25);
+}
+
+/* Button enhancements */
+.btn-lg {
+    font-weight: 600; /* Make large buttons bolder */
+}
+
+.btn-success {
+    background-color: #28a745; /* Deeper green */
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.btn-secondary {
+    background-color: #6c757d; /* Standard grey */
+    border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+/* Specific styling for the 'No categories' message */
+.form-text.text-danger a {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+/* Optional: Add a subtle transition to card hover for interactive feel */
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); /* Slightly larger shadow on hover */
+}
+/* Add to static/css/style.css */
+
+/* Custom styling for form helper text */
+.form-help-text {
+    font-size: 0.85em; /* Slightly smaller text */
+    margin-top: 5px;   /* Small margin above */
+    display: block;    /* Ensure it takes full width */
+}
+
+.text-danger {
+    color: var(--flash-error-bg); /* Using error color for consistency */
+}
+
+/* Styling for button group in forms */
+.form-buttons {
+    margin-top: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 15px; /* Space between buttons */
+}
+
+@media (max-width: 480px) {
+    .form-buttons {
+        flex-direction: column; /* Stack buttons on small screens */
+        align-items: center;   /* Center stacked buttons */
+        gap: 10px;
+    }
+}
+/* --- Data Display & Table Styling --- */
+
+/* General container for displaying data lists */
+.data-container {
+    max-width: 1000px; /* Wider than form-container */
+    margin: 40px auto;
+    padding: 30px;
+    background: var(--card-background);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px var(--shadow-color);
+    border: 1px solid var(--border-color);
+}
+
+.data-container h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    color: var(--heading-color);
+    font-size: 2.2em;
+    margin-bottom: 30px;
+    text-align: center;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Table Wrapper for Responsiveness */
+.table-responsive-wrapper {
+    overflow-x: auto; /* Enables horizontal scrolling for tables on small screens */
+    margin-top: 20px;
+    border-radius: 8px; /* Rounded corners for the table wrapper */
+    border: 1px solid var(--border-color); /* Subtle border for the wrapper */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Shadow for the table block */
+}
+
+/* Custom Table Styling */
+.custom-table {
+    width: 100%;
+    border-collapse: separate; /* Allows border-radius on cells */
+    border-spacing: 0;
+    color: var(--text-color);
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.95em;
+    min-width: 600px; /* Ensure table doesn't get too squished on small screens */
+}
+
+.custom-table th,
+.custom-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color); /* Separator between rows */
+}
+
+.custom-table th {
+    background-color: var(--header-footer-bg); /* Darker header background */
+    color: var(--nav-link-color);
+    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    position: sticky;
+    top: 0; /* Makes header sticky if table is scrollable */
+    z-index: 10;
+}
+
+.custom-table tbody tr {
+    background-color: var(--card-background); /* Default row background */
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.custom-table tbody tr:nth-child(even) {
+    background-color: #1a2440; /* Slightly different shade for even rows */
+}
+
+.custom-table tbody tr:hover {
+    background-color: #253350; /* Lighter background on hover */
+    transform: translateY(-2px); /* Slight lift on hover */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Shadow on hover */
+    z-index: 5; /* Bring hovered row to front */
+}
+
+/* Table Caption */
+.table-caption {
+    padding: 10px 15px;
+    color: rgba(255, 255, 255, 0.7); /* Lighter text for caption */
+    font-size: 0.9em;
+    text-align: left;
+}
+
+/* Table specific text colors */
+.custom-table .text-success {
+    color: var(--flash-success-bg); /* Green from flash messages */
+}
+
+.custom-table .text-danger {
+    color: var(--flash-error-bg); /* Red from flash messages */
+}
+
+/* Bold text for category names */
+.bold-text {
+    font-weight: 600;
+}
+
+/* Table actions (buttons) */
+.table-actions {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+    flex-wrap: nowrap; /* Prevent wrapping buttons */
+    align-items: center;
+}
+
+/* Small button styling for table actions */
+.button.button-sm {
+    padding: 6px 12px;
+    font-size: 0.85em;
+    border-radius: 20px;
+    box-shadow: none; /* Remove shadow for small buttons */
+}
+
+.button.button-sm:hover {
+    transform: none; /* No lift for small buttons */
+    box-shadow: none; /* No shadow for small buttons */
+}
+
+/* Danger button variant for delete */
+.button.danger {
+    background-image: linear-gradient(45deg, #dc3545 0%, #ff6f6f 100%);
+    color: #ffffff;
+}
+
+.button.danger:hover {
+    background-position: 100% 0;
+    box-shadow: 0 8px 15px rgba(220, 53, 69, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Message when no budgets are set */
+.empty-state-message {
+    text-align: center;
+    font-size: 1.1em;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 40px 0;
+}
+
+/* Button group below the table */
+.action-button-group {
+    margin-top: 30px;
+    text-align: center;
+}
+
+/* Responsive adjustments for table */
+@media (max-width: 768px) {
+    .data-container {
+        margin: 20px 15px;
+        padding: 20px;
+    }
+
+    .data-container h2 {
+        font-size: 1.8em;
+        margin-bottom: 20px;
+    }
+
+    .custom-table th,
+    .custom-table td {
+        padding: 10px 12px;
+        font-size: 0.9em;
+    }
+
+    .custom-table {
+        min-width: 500px; /* Keep minimum width for scroll */
+    }
+
+    .table-actions {
+        flex-direction: column; /* Stack buttons in table on smaller screens */
+        gap: 5px;
+    }
+
+    .button.button-sm {
+        width: 100%; /* Make small buttons full width when stacked */
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .custom-table {
+        min-width: 400px;
+    }
+    .action-button-group .button {
+        width: 90%; /* Make main action button wider */
+    }
+}
+/* --- Dashboard Specific Styling --- */
+
+/* Adjustments for data-container when used on dashboard */
+.dashboard-page-container {
+    max-width: 1200px; /* Wider container for the dashboard */
+    padding: 30px;
+}
+
+.dashboard-page-container h2 {
+    margin-bottom: 20px;
+}
+
+.dashboard-page-container .tagline {
+    margin-bottom: 40px; /* More space below welcome message */
+}
+
+/* Dashboard Grid Layout for Cards */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); /* Two columns on larger screens, stacks on smaller */
+    gap: 30px; /* Space between cards */
+    margin-top: 30px;
+}
+
+/* Individual Dashboard Cards */
+.dashboard-card {
+    background: var(--card-background);
+    border-radius: 12px;
+    box-shadow: 0 8px 25px var(--shadow-color);
+    padding: 30px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+}
+
+.dashboard-card h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    color: var(--heading-color);
+    font-size: 1.8em;
+    margin-bottom: 25px;
+    text-align: center;
+    border-bottom: 2px solid var(--primary-button-bg); /* Accent underline */
+    padding-bottom: 10px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Quick Overview Section */
+.summary-section {
+    flex-grow: 1; /* Allows it to take up available space */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 300px; /* Limit width of summary items */
+    padding: 12px 0;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
+    font-size: 1.1em;
+}
+
+.summary-item:last-of-type {
+    border-bottom: none; /* No border for the last item */
+}
+
+.summary-item strong {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.summary-amount {
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.income-amount {
+    color: var(--flash-success-bg); /* Green */
+}
+
+.expense-amount {
+    color: var(--flash-error-bg); /* Red */
+}
+
+.net-savings-amount {
+    color: var(--flash-info-bg); /* Blue for net savings */
+}
+
+.summary-item.total-savings {
+    padding-top: 20px;
+    border-top: 2px solid var(--accent-color); /* Thicker line for net savings */
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.summary-divider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 15px auto;
+    width: 80%;
+}
+
+
+/* Quick Actions Section */
+.quick-actions-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Space between action items */
+    flex-grow: 1; /* Allow list to take up space */
+    justify-content: center; /* Center buttons vertically */
+}
+
+.quick-actions-list li {
+    text-align: center;
+}
+
+.quick-actions-list a.button {
+    width: 100%; /* Make buttons fill their container */
+    padding: 12px 20px;
+    font-size: 1em;
+    border-radius: 8px; /* Slightly less rounded than default buttons */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.quick-actions-list a.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Responsive Adjustments for Dashboard */
+@media (max-width: 992px) {
+    .dashboard-page-container {
+        padding: 25px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr; /* Stack columns on medium/small screens */
+        gap: 25px;
+    }
+
+    .dashboard-card {
+        padding: 25px;
+    }
+
+    .dashboard-card h3 {
+        font-size: 1.6em;
+        margin-bottom: 20px;
+    }
+
+    .summary-item {
+        font-size: 1em;
+    }
+
+    .quick-actions-list a.button {
+        padding: 10px 15px;
+        font-size: 0.95em;
+    }
+}
+
+@media (max-width: 576px) {
+    .dashboard-page-container {
+        padding: 15px;
+    }
+
+    .dashboard-card {
+        padding: 20px;
+    }
+
+    .dashboard-card h3 {
+        font-size: 1.4em;
+    }
+
+    .summary-item {
+        flex-direction: column; /* Stack amount below label on very small screens */
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .summary-item span:first-child {
+        margin-bottom: 0; /* Adjust margin if needed for stacking */
+    }
+
+    .summary-item .summary-amount {
+        font-size: 1.1em; /* Make amount slightly larger when stacked */
+    }
+    
+    .summary-item.total-savings {
+        font-size: 1.1em;
+    }
+}
+/* --- Report Specific Styling --- */
+
+.report-container {
+    max-width: 1200px; /* Slightly wider for reports */
+    margin: 40px auto;
+    padding: 30px;
+    background: var(--background-color); /* Lighter background than card for overall report area */
+    border-radius: 12px;
+    box-shadow: 0 10px 30px var(--shadow-color);
+}
+
+.report-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: var(--heading-color);
+    font-size: 2.5em;
+    margin-bottom: 40px;
+    text-align: center;
+    text-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+}
+
+/* General Report Card Styling */
+.report-card {
+    background: var(--card-background);
+    border-radius: 10px;
+    box-shadow: 0 5px 20px var(--shadow-color);
+    border: 1px solid var(--border-color);
+    margin-bottom: 30px; /* Spacing between cards */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.report-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+}
+
+.report-card-header {
+    background-color: var(--header-footer-bg); /* Darker header */
+    color: var(--nav-link-color);
+    padding: 15px 25px;
+    border-bottom: 1px solid var(--border-color);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 1.2em;
+}
+
+.report-card-body {
+    padding: 25px;
+    color: var(--text-color);
+}
+
+/* Filter Form Specifics */
+.filter-card .report-card-body {
+    padding-bottom: 15px; /* Less padding if needed */
+}
+
+.filter-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive columns */
+    gap: 20px;
+    align-items: end; /* Align items to the bottom */
+}
+
+.filter-button-group {
+    grid-column: span 1; /* Ensure button takes its own column space */
+}
+
+.button.full-width {
+    width: 100%; /* Make button fill its column */
+}
+
+/* Total Expenses Summary Card */
+.summary-total-card {
+    background-image: linear-gradient(45deg, #dc3545 0%, #ff6f6f 100%); /* Red gradient for danger */
+    color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
+    margin-bottom: 30px;
+    text-align: center;
+    border: none; /* Remove default border */
+    overflow: hidden; /* Ensure gradient clips at border radius */
+}
+
+.summary-total-header {
+    padding: 15px 25px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 1.2em;
+    background-color: rgba(0, 0, 0, 0.2); /* Slightly darker overlay for header */
+}
+
+.summary-total-body {
+    padding: 25px;
+}
+
+.summary-total-amount {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 3em;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Chart Grid */
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* Two columns for charts */
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.chart-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 400px; /* Ensure charts have a minimum height */
+}
+
+.chart-body {
+    flex-grow: 1; /* Allow body to fill remaining space */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 !important; /* Remove default padding for charts */
+    overflow: hidden; /* Hide overflow if charts are larger than container */
+}
+
+.responsive-chart-img {
+    max-width: 100%;
+    height: auto;
+    display: block; /* Remove extra space below image */
+}
+
+.empty-chart-message {
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* Table Card (re-uses custom-table from view_budgets) */
+.table-card .report-card-body {
+    padding: 0; /* Remove padding from body as table wrapper handles it */
+    overflow: hidden; /* Ensure border-radius applies to table content */
+}
+
+/* Responsive Adjustments for Reports */
+@media (max-width: 992px) {
+    .report-container {
+        padding: 20px;
+    }
+
+    .report-title {
+        font-size: 2em;
+        margin-bottom: 30px;
+    }
+
+    .report-card {
+        margin-bottom: 25px;
+    }
+
+    .report-card-header {
+        font-size: 1.1em;
+        padding: 12px 20px;
+    }
+
+    .report-card-body {
+        padding: 20px;
+    }
+
+    .filter-form-grid {
+        grid-template-columns: 1fr; /* Stack filter items on smaller screens */
+        gap: 15px;
+    }
+
+    .chart-grid {
+        grid-template-columns: 1fr; /* Stack charts on smaller screens */
+        gap: 25px;
+    }
+
+    .summary-total-amount {
+        font-size: 2.5em;
+    }
+}
+
+@media (max-width: 576px) {
+    .report-container {
+        margin: 20px 10px;
+        padding: 15px;
+    }
+
+    .report-title {
+        font-size: 1.8em;
+        margin-bottom: 25px;
+    }
+
+    .report-card-header {
+        font-size: 1em;
+        padding: 10px 15px;
+    }
+
+    .report-card-body {
+        padding: 15px;
+    }
+
+    .summary-total-amount {
+        font-size: 2em;
+    }
+
+    .chart-card {
+        min-height: 300px; /* Reduce min height for very small screens */
+    }
+}
+/* --- Monthly Summary Report Specific Styling --- */
+
+/* Grid for the main financial overview cards */
+.summary-report-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* 3 columns on larger screens */
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+/* Individual Summary Stat Card Styling */
+.summary-stat-card {
+    color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: none; /* Remove default border */
+}
+
+.summary-stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+}
+
+/* Variants for Summary Stat Cards based on financial outcome */
+.summary-stat-card.success {
+    background-image: linear-gradient(45deg, #28a745 0%, #4CAF50 100%); /* Green gradient for income/positive */
+}
+
+.summary-stat-card.danger {
+    background-image: linear-gradient(45deg, #dc3545 0%, #FF5252 100%); /* Red gradient for expenses/negative */
+}
+
+.summary-stat-card.info {
+    background-image: linear-gradient(45deg, #007bff 0%, #2196F3 100%); /* Blue gradient for net savings */
+}
+
+.summary-stat-header {
+    padding: 15px 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 1.1em;
+    background-color: rgba(0, 0, 0, 0.2); /* Slightly darker overlay for header */
+}
+
+.summary-stat-body {
+    padding: 20px;
+}
+
+.summary-stat-amount {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 2.8em;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Status Badges for Budget Table */
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px; /* Pill shape */
+    font-size: 0.85em;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    background-color: #6c757d; /* Default grey */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.status-badge.success {
+    background-image: linear-gradient(45deg, #28a745 0%, #4CAF50 100%);
+}
+
+.status-badge.danger {
+    background-image: linear-gradient(45deg, #dc3545 0%, #FF5252 100%);
+}
+
+/* Responsive Adjustments for Monthly Summary Report */
+@media (max-width: 992px) {
+    .summary-report-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Adjust columns for smaller screens */
+        gap: 25px;
+    }
+
+    .summary-stat-card {
+        margin-bottom: 25px;
+    }
+
+    .summary-stat-amount {
+        font-size: 2.2em;
+    }
+}
+
+@media (max-width: 768px) {
+    .summary-report-grid {
+        grid-template-columns: 1fr; /* Stack columns on tablets */
+        gap: 20px;
+    }
+
+    .summary-stat-amount {
+        font-size: 2em;
+    }
+}
+
+@media (max-width: 576px) {
+    .summary-stat-header {
+        font-size: 1em;
+    }
+
+    .summary-stat-amount {
+        font-size: 1.8em;
+    }
+
+    .status-badge {
+        font-size: 0.75em;
+        padding: 5px 10px;
+    }
+}
+/* --- Button Success Variant --- */
+.button.success {
+    background-image: linear-gradient(45deg, #28a745 0%, #4CAF50 100%);
+    color: #ffffff;
+}
+
+.button.success:hover {
+    background-position: 100% 0;
+    box-shadow: 0 8px 15px rgba(40, 167, 69, 0.4);
+    transform: translateY(-2px);
+}
+/* --- Transactions List Specific Styling --- */
+
+/* Group for top action buttons */
+.action-buttons-top-group {
+    display: flex;
+    justify-content: space-between; /* Space out the buttons */
+    gap: 15px; /* Space between buttons */
+    margin-bottom: 30px; /* Space below the buttons */
+    flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+}
+
+.action-buttons-top-group .button {
+    flex-grow: 1; /* Allow buttons to grow and fill space */
+    max-width: 200px; /* Limit max width for aesthetic */
+    padding: 12px 25px; /* Larger padding for top buttons */
+    font-size: 1.05em;
+    border-radius: 8px;
+}
+
+/* Table Caption Styling */
+.custom-table caption {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.1em;
+    color: var(--text-color);
+    text-align: left;
+    margin-bottom: 15px;
+    padding: 0 5px; /* Align with table padding */
+}
+
+/* Action Buttons within Table Cells */
+.action-buttons-cell {
+    white-space: nowrap; /* Prevent buttons from wrapping inside cell */
+}
+
+.action-buttons-cell .button.small {
+    padding: 8px 12px; /* Smaller padding for table buttons */
+    font-size: 0.85em;
+    border-radius: 6px;
+    margin: 0 4px; /* Space between edit and delete buttons */
+    min-width: 70px; /* Ensure buttons have a minimum width */
+}
+
+.action-buttons-cell form {
+    display: inline-block; /* Ensure form doesn't break line */
+    margin: 0;
+}
+
+/* Adjustments for general text utilities in tables */
+.text-right {
+    text-align: right !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .action-buttons-top-group {
+        flex-direction: column; /* Stack buttons vertically on smaller screens */
+        align-items: stretch; /* Stretch buttons to full width */
+    }
+
+    .action-buttons-top-group .button {
+        max-width: 100%; /* Full width */
+    }
+}
+
+@media (max-width: 576px) {
+    .action-buttons-cell .button.small {
+        padding: 6px 8px; /* Even smaller padding on very small screens */
+        font-size: 0.8em;
+        min-width: 60px;
+        margin: 0 2px;
+    }
+}
+/* --- List Expenses/Incomes Specific Styling (re-using much from list_transactions) --- */
+
+/* Utility for bold text */
+.font-bold {
+    font-weight: 700;
+}
+
+/* Group for buttons at the bottom of a list/table */
+.bottom-action-buttons-group {
+    display: flex;
+    justify-content: flex-end; /* Align to the right */
+    margin-top: 30px; /* Space above the button */
+    padding-top: 20px; /* Padding above the button group */
+    border-top: 1px solid var(--border-color); /* Separator line */
+}
+
+.bottom-action-buttons-group .button {
+    min-width: 200px; /* Ensure a decent size */
+    text-align: center;
+}
+
+/* Adjustments for 'large' button size */
+.button.large {
+    padding: 15px 30px;
+    font-size: 1.15em;
+    border-radius: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .bottom-action-buttons-group {
+        justify-content: center; /* Center button on smaller screens */
+        flex-direction: column; /* Stack if multiple buttons */
+        align-items: center;
+    }
+
+    .bottom-action-buttons-group .button {
+        width: 100%; /* Full width */
+        max-width: 300px; /* Limit max width for readability */
+    }
+}
+/* --- Categories Specific Styling --- */
+
+/* Category Type colors - new */
+.category-type-expense {
+    color: var(--danger-color); /* Red for expense */
+    font-weight: 500;
+}
+.category-type-income {
+    color: var(--success-color); /* Green for income */
+    font-weight: 500;
+}
+/* --- Expense Breakdown Report Specific Styling for "More Cool" --- */
+
+/* New grid for single summary card, consistent with monthly_summary_report */
+.summary-report-grid-single {
+    display: grid;
+    grid-template-columns: 1fr; /* Always a single column */
+    gap: 30px; /* Consistent gap */
+    margin-bottom: 40px; /* Space after the summary card */
+}
+
+/* New grid for single chart, consistent with monthly_summary_report */
+.chart-grid-single {
+    display: grid;
+    grid-template-columns: 1fr; /* Always a single column */
+    gap: 30px; /* Consistent gap */
+    margin-bottom: 40px; /* Space after the chart card */
+}
+
+/* Ensure chart body itself has no padding, letting Plotly handle its internal spacing */
+.report-card-body.chart-body {
+    padding: 0;
+    display: flex; /* Use flexbox to center content */
+    justify-content: center;
+    align-items: center;
+    min-height: 350px; /* Ensure charts have a minimum height even if empty */
+}
+
+/* Enhanced styling for empty messages (charts and tables) */
+.empty-chart-message,
+.empty-state-message {
+    padding: 40px; /* More generous padding */
+    font-size: 1.15em;
+    color: var(--text-color-light); /* Lighter text for empty state */
+    text-align: center;
+    background-color: var(--card-background-light); /* Subtle background for the message area */
+    border-radius: 12px;
+    margin: 30px; /* Provide some margin around the message within the card body */
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.15); /* More pronounced inner shadow */
+    font-style: italic;
+    line-height: 1.6;
+    display: flex; /* Use flexbox to vertically center text */
+    align-items: center;
+    justify-content: center;
+    width: calc(100% - 60px); /* Adjust width for margin inside card */
+    height: calc(100% - 60px); /* Adjust height for margin inside card */
+    flex-grow: 1; /* Allow it to grow in flex container */
+}
+
+/* Refinements for general report cards */
+.report-card {
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); /* More pronounced shadow */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden; /* Ensure content respects border-radius */
+    border: 1px solid var(--border-color); /* Subtle border */
+}
+
+.report-card:hover {
+    transform: translateY(-7px); /* Slightly more lift on hover */
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6); /* Larger shadow on hover */
+}
+
+.report-card-header {
+    background-color: var(--card-header-background);
+    color: var(--header-text-color);
+    padding: 20px 30px; /* More generous padding */
+    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    border-bottom: 1px solid var(--border-color-dark); /* Stronger separator */
+}
+
+.report-card-header h5 {
+    margin-bottom: 0;
+    font-size: 1.4em; /* Slightly larger header text */
+}
+
+/* Filter card specific body padding */
+.filter-card .report-card-body {
+    padding: 30px; /* Consistent padding for form areas */
+}
+
+/* Responsive adjustments for overall reports */
+@media (max-width: 992px) {
+    .summary-report-grid-single,
+    .chart-grid-single {
+        gap: 25px;
+        margin-bottom: 35px;
+    }
+    .report-card-header {
+        padding: 18px 25px;
+    }
+    .report-card-header h5 {
+        font-size: 1.3em;
+    }
+    .empty-chart-message,
+    .empty-state-message {
+        padding: 30px;
+        font-size: 1.1em;
+        width: calc(100% - 40px);
+        height: calc(100% - 40px);
+        margin: 20px;
+    }
+    .report-card-body.chart-body {
+        min-height: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    .summary-report-grid-single,
+    .chart-grid-single {
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    .report-card-header {
+        padding: 15px 20px;
+    }
+    .report-card-header h5 {
+        font-size: 1.2em;
+    }
+    .empty-chart-message,
+    .empty-state-message {
+        padding: 25px;
+        font-size: 1em;
+    }
+    .report-card-body.chart-body {
+        min-height: 250px;
+    }
+}

@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Monthly Summary Report{% endblock %}
+
+{% block content %}
+<div class="report-container"> {# Re-using our custom report container #}
+    <h2 class="report-title">Monthly Summary Report</h2> {# Re-using custom report title #}
+
+    {# Month/Year Selection Form #}
+    <div class="report-card filter-card"> {# Re-using custom card styling for filter form #}
+        <div class="report-card-header">
+            <h5>Select Month & Year</h5> {# Re-using custom header for cards #}
+        </div>
+        <div class="report-card-body">
+            <form method="GET" action="{{ url_for('monthly_summary_report') }}">
+                <div class="filter-form-grid"> {# Re-using custom grid for filter elements #}
+                    <div class="form-group">
+                        <label for="month_select">Month:</label>
+                        <select class="form-control" id="month_select" name="month"> {# Re-using form-control #}
+                            {% for i in range(1, 13) %}
+                                <option value="{{ i }}" {% if i == selected_month %}selected{% endif %}>
+                                    {{ (current_month.replace(day=1, month=i)).strftime('%B') }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="year_select">Year:</label>
+                        <select class="form-control" id="year_select" name="year"> {# Re-using form-control #}
+                            {% for year_val in range(current_year - 5, current_year + 2) %}
+                                <option value="{{ year_val }}" {% if year_val == selected_year %}selected{% endif %}>
+                                    {{ year_val }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-button-group"> {# Re-using custom class for button #}
+                        <button type="submit" class="button primary full-width">Apply Filter</button> {# Re-using custom button class #}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {# Financial Overview Summary Cards #}
+    <div class="summary-report-grid"> {# New grid for these summary cards #}
+        <div class="summary-stat-card success"> {# New custom card for total summary, with 'success' variant #}
+            <div class="summary-stat-header">Total Income ({{ current_month.strftime('%B %Y') }})</div>
+            <div class="summary-stat-body">
+                <div class="summary-stat-amount">₹{{ "{:,.2f}".format(total_income) }}</div> {# Corrected Rupee symbol #}
+            </div>
+        </div>
+        <div class="summary-stat-card danger"> {# 'danger' variant #}
+            <div class="summary-stat-header">Total Expenses ({{ current_month.strftime('%B %Y') }})</div>
+            <div class="summary-stat-body">
+                <div class="summary-stat-amount">₹{{ "{:,.2f}".format(total_expenses) }}</div> {# Corrected Rupee symbol #}
+            </div>
+        </div>
+        <div class="summary-stat-card info"> {# 'info' variant #}
+            <div class="summary-stat-header">Net Savings ({{ current_month.strftime('%B %Y') }})</div>
+            <div class="summary-stat-body">
+                <div class="summary-stat-amount">₹{{ "{:,.2f}".format(net_savings) }}</div> {# Corrected Rupee symbol #}
+            </div>
+        </div>
+    </div>
+
+    {# --- Plotly Charts Section --- #}
+    <div class="chart-grid"> {# Re-using custom chart grid #}
+        <div class="report-card chart-card"> {# Re-using custom chart card #}
+            <div class="report-card-header">
+                <h5>Expense Distribution</h5>
+            </div>
+            <div class="report-card-body chart-body">
+                {% if expense_pie_chart_html %}
+                    {{ expense_pie_chart_html | safe }}
+                {% else %}
+                    <p class="empty-chart-message">No expense data for the selected month to display chart.</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="report-card chart-card"> {# Re-using custom chart card #}
+            <div class="report-card-header">
+                <h5>Income vs. Expense Trend</h5>
+            </div>
+            <div class="report-card-body chart-body">
+                {% if income_expense_trend_chart_html %}
+                    {{ income_expense_trend_chart_html | safe }}
+                {% else %}
+                    <p class="empty-chart-message">No income/expense trend data to display chart.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {# --- End Plotly Charts Section --- #}
+
+    {# Budget Summary Table #}
+    <div class="report-card table-card"> {# Re-using custom table card #}
+        <div class="report-card-header">
+            <h5>Budget Performance ({{ current_month.strftime('%B %Y') }})</h5>
+        </div>
+        <div class="report-card-body">
+            {% if budget_summary %}
+            <div class="table-responsive-wrapper"> {# Re-using custom table wrapper #}
+                <table class="custom-table"> {# Re-using custom table #}
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Budgeted</th>
+                            <th>Spent</th>
+                            <th>Remaining</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for budget in budget_summary %}
+                        <tr>
+                            <td>{{ budget.category }}</td>
+                            <td>₹{{ "{:,.2f}".format(budget.budgeted) }}</td> {# Corrected Rupee symbol #}
+                            <td>₹{{ "{:,.2f}".format(budget.spent) }}</td> {# Corrected Rupee symbol #}
+                            <td>₹{{ "{:,.2f}".format(budget.remaining) }}</td> {# Corrected Rupee symbol #}
+                            <td>
+                                {% if budget.status == 'Under Budget' %}
+                                    <span class="status-badge success">{{ budget.status }}</span> {# New custom badge class #}
+                                {% else %}
+                                    <span class="status-badge danger">{{ budget.status }}</span> {# New custom badge class #}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="empty-state-message">No budgets set or no activity for the selected period.</p> {# Re-using empty state message #}
+            {% endif %}
+        </div>
+    </div>
+
+    {# Monthly Data Table #}
+    <div class="report-card table-card"> {# Re-using custom table card #}
+        <div class="report-card-header">
+            <h5>Monthly Data Overview (Last 12 Months)</h5>
+        </div>
+        <div class="report-card-body">
+            {% if monthly_data %}
+            <div class="table-responsive-wrapper"> {# Re-using custom table wrapper #}
+                <table class="custom-table"> {# Re-using custom table #}
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Income</th>
+                            <th>Expenses</th>
+                            <th>Net</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in monthly_data %}
+                        <tr>
+                            <td>{{ data.month }}</td>
+                            <td>₹{{ "{:,.2f}".format(data.income) }}</td> {# Corrected Rupee symbol #}
+                            <td>₹{{ "{:,.2f}".format(data.expense) }}</td> {# Corrected Rupee symbol #}
+                            <td>₹{{ "{:,.2f}".format(data.net) }}</td> {# Corrected Rupee symbol #}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="empty-state-message">No monthly data available.</p> {# Re-using empty state message #}
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+<div class="data-container dashboard-page-container"> {# Using data-container for consistency, adding a dashboard-specific class #}
+    <div class="welcome-section"> {# This class should already be styled from home.html #}
+        <h2>Welcome, {{ user.username }}!</h2>
+        <p class="tagline">This is your personal finance dashboard. Quickly view your financial snapshot and access essential tools to manage your expenses, income, and categories.</p> {# Added tagline for consistent styling #}
+    </div>
+
+    <div class="dashboard-grid"> {# New custom grid wrapper #}
+        <div class="dashboard-card"> {# Custom card styling #}
+            <h3>Quick Overview</h3>
+            <div class="summary-section"> {# New wrapper for summary items #}
+                {# Financial overview data will appear here once your transactions and reports features are ready! #}
+                {% if total_income is defined and total_expenses is defined and net_savings is defined %}
+                    <div class="summary-item">
+                        <span><strong>Total Income:</strong></span>
+                        <span class="summary-amount income-amount">₹{{ "%.2f"|format(total_income | float) }}</span> {# Corrected Rupee symbol #}
+                    </div>
+                    <div class="summary-item">
+                        <span><strong>Total Expenses:</strong></span>
+                        <span class="summary-amount expense-amount">₹{{ "%.2f"|format(total_expenses | float) }}</span> {# Corrected Rupee symbol #}
+                    </div>
+                    <hr class="summary-divider"> {# New custom divider #}
+                    <div class="summary-item total-savings"> {# Added class for net savings #}
+                        <span><strong>Net Savings:</strong></span>
+                        <span class="summary-amount net-savings-amount">₹{{ "%.2f"|format(net_savings | float) }}</span> {# Corrected Rupee symbol #}
+                    </div>
+                {% else %}
+                    <p class="empty-state-message">Financial overview data will appear here once your transactions and reports features are ready!</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="dashboard-card"> {# Custom card styling #}
+            <h3>Quick Actions</h3>
+            <div class="quick-actions-list"> {# New wrapper for action links #}
+                <ul>
+                    <li><a href="{{ url_for('add_transaction', transaction_type='expense') }}" class="button primary">Record New Expense</a></li> {# Custom button class #}
+                    <li><a href="{{ url_for('add_transaction', transaction_type='income') }}" class="button secondary">Record New Income</a></li> {# Custom button class #}
+                    <li><a href="{{ url_for('list_categories') }}" class="button primary">Manage Categories</a></li> {# Custom button class #}
+                    <li><a href="{{ url_for('list_budgets') }}" class="button secondary">View Budgets</a></li> {# Custom button class #}
+                    <li><a href="{{ url_for('monthly_summary_report') }}" class="button primary">View Reports</a></li> {# Added View Reports link #}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

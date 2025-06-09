@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}500 - Internal Server Error{% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <style>
+        /* Custom styles for the 500 error page */
+        .error-container {
+            min-height: calc(100vh - 120px); /* Adjust based on your header/footer height */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            color: #495057; /* Darker grey for text */
+        }
+
+        .error-code {
+            font-size: 8rem; /* Large font size for 500 */
+            font-weight: 700; /* Bold */
+            color: #ffc107; /* Bootstrap warning yellow */
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1); /* Subtle text shadow */
+        }
+
+        .error-message {
+            font-size: 1.8rem; /* Slightly larger message */
+            margin-bottom: 1.5rem;
+            color: #6c757d; /* Lighter grey for message */
+        }
+
+        .error-suggestion {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn-go-home {
+            padding: 0.8rem 2rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 0.5rem; /* Rounded corners for button */
+            background-color: #007bff; /* Primary blue */
+            border-color: #007bff;
+            color: white;
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .btn-go-home:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+            transform: translateY(-2px); /* Slight lift on hover */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow on hover */
+        }
+
+        /* Ensure body background color is consistent, if not already in base.html */
+        body {
+            background-color: #f8f9fa;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container error-container">
+    <h1 class="error-code">500</h1>
+    <p class="error-message">Something went wrong on our end.</p>
+    <p class="error-suggestion">An internal server error occurred. We're working hard to fix it!</p>
+    <p>
+        <a href="{{ url_for('dashboard_page') }}" class="btn btn-go-home">Go to Dashboard</a> {# CORRECTED: Assuming 'dashboard_page' is the actual endpoint #}
+    </p>
+</div>
+{% endblock %}
