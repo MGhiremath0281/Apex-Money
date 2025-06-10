@@ -177,7 +177,7 @@ def create_app():
 
             if not username or not password:
                 flash('Username and password are required.', 'danger')
-                return render_template('register.html')
+                return render_template('auth/register.html') # FIXED: Added 'auth/'
 
             user = User(username=username, email=email)
             user.set_password(password)
@@ -190,9 +190,9 @@ def create_app():
             except IntegrityError:
                 db.session.rollback()
                 flash('Username or email already exists. Please choose another.', 'danger')
-                return render_template('register.html')
+                return render_template('auth/register.html') # FIXED: Added 'auth/'
         # This return statement is for GET requests, so it renders the form initially
-        return render_template('register.html')
+        return render_template('auth/register.html') # FIXED: Added 'auth/'
 
 
     @app.route('/login', methods=['GET', 'POST'])
@@ -632,7 +632,7 @@ def create_app():
             ).scalar() or Decimal('0.00')
             
             if category_total > 0: # Only include categories with actual expenses
-                category_data.append({ # Corrected to append to category_data
+                category_data.append({
                     'name': category.name,
                     'type': category.type,
                     'total': category_total
@@ -820,7 +820,7 @@ def create_app():
         full_df['Date'] = full_df['Date'].dt.date # Convert to date objects to match daily_balance
         
         # Merge the daily_balance with the full date range
-        merged_df = pd.df(full_df, on='Date', how='left')
+        merged_df = full_df.merge(daily_balance, on='Date', how='left') # Corrected: pd.df -> full_df.merge
         
         # Fill missing Net Worth values with the last valid observation
         merged_df['Net Worth'] = merged_df['Net Worth'].fillna(method='ffill')
