@@ -39,8 +39,7 @@ class Config:
 # Initialize these outside create_app, then attach them to the app inside create_app
 db = SQLAlchemy()
 migrate = Migrate()
-login_manager = LoginManager() # MOVED HERE: Initialize the LoginManager instance globally
-
+login_manager = LoginManager()
 # --- Models ---
 class Base(db.Model):
     __abstract__ = True
@@ -120,16 +119,7 @@ def create_app():
     def load_user(user_id):
         return db.session.get(User, int(user_id))
 
-    # --- REMOVED db.create_all() HERE ---
-    # This is handled by Flask-Migrate using 'flask db upgrade' in your Render Build Command.
-    # Running db.create_all() here in a deployment environment is not recommended.
-    # with app.app_context():
-    #      db.create_all()
-
     # --- Routes ---
-    # Moved all routes inside the create_app function so they are registered with the
-    # 'app' instance created by the factory.
-
     @app.route('/')
     def home():
         return render_template('home.html')
@@ -160,7 +150,7 @@ def create_app():
         net_savings = total_income - total_expenses
 
         return render_template(
-            'reports/dashboard.html',
+            'reports/dashboard.html', # Path confirmed
             user=current_user,
             total_income=total_income,
             total_expenses=total_expenses,
@@ -171,13 +161,13 @@ def create_app():
     @app.route('/register', methods=['GET', 'POST'])
     def register():
         if request.method == 'POST':
-            username = request.form.get('username')
-            email = request.form.get('email')
+            username = request.form.get('username').strip() # Added .strip()
+            email = request.form.get('email').strip() if request.form.get('email') else None # Added .strip()
             password = request.form.get('password')
 
             if not username or not password:
                 flash('Username and password are required.', 'danger')
-                return render_template('auth/register.html') # FIXED: Added 'auth/'
+                return render_template('auth/register.html') # Path fixed
 
             user = User(username=username, email=email)
             user.set_password(password)
@@ -190,9 +180,9 @@ def create_app():
             except IntegrityError:
                 db.session.rollback()
                 flash('Username or email already exists. Please choose another.', 'danger')
-                return render_template('auth/register.html') # FIXED: Added 'auth/'
+                return render_template('auth/register.html') # Path fixed
         # This return statement is for GET requests, so it renders the form initially
-        return render_template('auth/register.html') # FIXED: Added 'auth/'
+        return render_template('auth/register.html') # Path fixed
 
 
     @app.route('/login', methods=['GET', 'POST'])
@@ -762,7 +752,7 @@ def create_app():
         years_for_dropdown = list(range(min_year, current_year + 2)) # Current year + next year
 
         return render_template(
-            'reports/monthly_summary.html',
+            'reports/monthly_summary.html', # Path confirmed
             total_income_month=total_income_month,
             total_expense_month=total_expense_month,
             net_savings_month=total_income_month - total_expense_month,
