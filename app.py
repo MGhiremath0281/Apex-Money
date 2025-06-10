@@ -1,15 +1,16 @@
 # personal_finance_manager_web/app.py
-
 import os
+from datetime import datetime, timedelta, date
+from decimal import Decimal
+
 from flask import Flask, render_template, request, flash, redirect, url_for, Blueprint
-from flask_sqlalchemy import SQLAlchemy,
+from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, timedelta, date
-from sqlalchemy import func
-from decimal import Decimal
 from flask_migrate import Migrate
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
+
 
 # --- Imports for Plotting ---
 import plotly.express as px
@@ -158,11 +159,11 @@ def create_app():
 
     # --- Authentication Routes ---
     @app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        email = request.form.get('email')
-        password = request.form.get('password')
+    def register():
+        if request.method == 'POST':
+            username = request.form.get('username')
+            email = request.form.get('email')
+            password = request.form.get('password')
 
         if not username or not password:
             flash('Username and password are required.', 'danger')
