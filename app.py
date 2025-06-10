@@ -569,7 +569,7 @@ def create_app():
     @login_required
     def monthly_summary_report():
         user_id = current_user.id
-        today = datetime.now().date()
+        today = datetime.now().date() # Variable 'today' is defined here
         
         # Determine the current year for the dropdown range
         current_year = today.year 
@@ -753,6 +753,7 @@ def create_app():
 
         return render_template(
             'reports/monthly_summary.html', # Path confirmed
+            today=today, # <--- THIS IS THE NEW LINE ADDED TO FIX UndefinedError
             total_income_month=total_income_month,
             total_expense_month=total_expense_month,
             net_savings_month=total_income_month - total_expense_month,

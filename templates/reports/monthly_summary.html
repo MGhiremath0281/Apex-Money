@@ -17,9 +17,9 @@
                     <div class="form-group">
                         <label for="month_select">Month:</label>
                         <select class="form-control" id="month_select" name="month"> {# Re-using form-control #}
-                            {% for i in range(1, 13) %}
-                                <option value="{{ i }}" {% if i == selected_month %}selected{% endif %}>
-                                    {{ (current_month.replace(day=1, month=i)).strftime('%B') }}
+                            {% for month_option in months_for_dropdown %}
+                                <option value="{{ month_option.value }}" {% if month_option.value == selected_month %}selected{% endif %}>
+                                    {{ month_option.name }}
                                 </option>
                             {% endfor %}
                         </select>
@@ -27,7 +27,8 @@
                     <div class="form-group">
                         <label for="year_select">Year:</label>
                         <select class="form-control" id="year_select" name="year"> {# Re-using form-control #}
-                            {% for year_val in range(current_year - 5, current_year + 2) %}
+                            {# The 'years_for_dropdown' is passed from app.py, make sure it's correct. #}
+                            {% for year_val in years_for_dropdown %}
                                 <option value="{{ year_val }}" {% if year_val == selected_year %}selected{% endif %}>
                                     {{ year_val }}
                                 </option>
@@ -45,21 +46,25 @@
     {# Financial Overview Summary Cards #}
     <div class="summary-report-grid"> {# New grid for these summary cards #}
         <div class="summary-stat-card success"> {# New custom card for total summary, with 'success' variant #}
-            <div class="summary-stat-header">Total Income ({{ current_month.strftime('%B %Y') }})</div>
+            {# Use selected_month and selected_year for display, or today if not filtered #}
+            <div class="summary-stat-header">Total Income ({{ today.replace(day=1, month=selected_month, year=selected_year).strftime('%B %Y') }})</div>
             <div class="summary-stat-body">
-                <div class="summary-stat-amount">₹{{ "{:,.2f}".format(total_income) }}</div> {# Corrected Rupee symbol #}
+                {# Variable name change from total_income to total_income_month as per app.py #}
+                <div class="summary-stat-amount">₹{{ "{:,.2f}".format(total_income_month) }}</div>
             </div>
         </div>
         <div class="summary-stat-card danger"> {# 'danger' variant #}
-            <div class="summary-stat-header">Total Expenses ({{ current_month.strftime('%B %Y') }})</div>
+            <div class="summary-stat-header">Total Expenses ({{ today.replace(day=1, month=selected_month, year=selected_year).strftime('%B %Y') }})</div>
             <div class="summary-stat-body">
-                <div class="summary-stat-amount">₹{{ "{:,.2f}".format(total_expenses) }}</div> {# Corrected Rupee symbol #}
+                {# Variable name change from total_expenses to total_expense_month as per app.py #}
+                <div class="summary-stat-amount">₹{{ "{:,.2f}".format(total_expense_month) }}</div>
             </div>
         </div>
         <div class="summary-stat-card info"> {# 'info' variant #}
-            <div class="summary-stat-header">Net Savings ({{ current_month.strftime('%B %Y') }})</div>
+            <div class="summary-stat-header">Net Savings ({{ today.replace(day=1, month=selected_month, year=selected_year).strftime('%B %Y') }})</div>
             <div class="summary-stat-body">
-                <div class="summary-stat-amount">₹{{ "{:,.2f}".format(net_savings) }}</div> {# Corrected Rupee symbol #}
+                {# Variable name change from net_savings to net_savings_month as per app.py #}
+                <div class="summary-stat-amount">₹{{ "{:,.2f}".format(net_savings_month) }}</div>
             </div>
         </div>
     </div>
@@ -71,8 +76,9 @@
                 <h5>Expense Distribution</h5>
             </div>
             <div class="report-card-body chart-body">
-                {% if expense_pie_chart_html %}
-                    {{ expense_pie_chart_html | safe }}
+                {# Variable name change from expense_pie_chart_html to expense_pie_chart as per app.py #}
+                {% if expense_pie_chart %}
+                    {{ expense_pie_chart | safe }}
                 {% else %}
                     <p class="empty-chart-message">No expense data for the selected month to display chart.</p>
                 {% endif %}
@@ -83,8 +89,9 @@
                 <h5>Income vs. Expense Trend</h5>
             </div>
             <div class="report-card-body chart-body">
-                {% if income_expense_trend_chart_html %}
-                    {{ income_expense_trend_chart_html | safe }}
+                {# Variable name change from income_expense_trend_chart_html to monthly_trend_chart as per app.py #}
+                {% if monthly_trend_chart %}
+                    {{ monthly_trend_chart | safe }}
                 {% else %}
                     <p class="empty-chart-message">No income/expense trend data to display chart.</p>
                 {% endif %}
@@ -96,7 +103,7 @@
     {# Budget Summary Table #}
     <div class="report-card table-card"> {# Re-using custom table card #}
         <div class="report-card-header">
-            <h5>Budget Performance ({{ current_month.strftime('%B %Y') }})</h5>
+            <h5>Budget Performance ({{ today.replace(day=1, month=selected_month, year=selected_year).strftime('%B %Y') }})</h5>
         </div>
         <div class="report-card-body">
             {% if budget_summary %}
@@ -115,9 +122,9 @@
                         {% for budget in budget_summary %}
                         <tr>
                             <td>{{ budget.category }}</td>
-                            <td>₹{{ "{:,.2f}".format(budget.budgeted) }}</td> {# Corrected Rupee symbol #}
-                            <td>₹{{ "{:,.2f}".format(budget.spent) }}</td> {# Corrected Rupee symbol #}
-                            <td>₹{{ "{:,.2f}".format(budget.remaining) }}</td> {# Corrected Rupee symbol #}
+                            <td>₹{{ "{:,.2f}".format(budget.budgeted) }}</td>
+                            <td>₹{{ "{:,.2f}".format(budget.spent) }}</td>
+                            <td>₹{{ "{:,.2f}".format(budget.remaining) }}</td>
                             <td>
                                 {% if budget.status == 'Under Budget' %}
                                     <span class="status-badge success">{{ budget.status }}</span> {# New custom badge class #}
@@ -157,9 +164,9 @@
                         {% for data in monthly_data %}
                         <tr>
                             <td>{{ data.month }}</td>
-                            <td>₹{{ "{:,.2f}".format(data.income) }}</td> {# Corrected Rupee symbol #}
-                            <td>₹{{ "{:,.2f}".format(data.expense) }}</td> {# Corrected Rupee symbol #}
-                            <td>₹{{ "{:,.2f}".format(data.net) }}</td> {# Corrected Rupee symbol #}
+                            <td>₹{{ "{:,.2f}".format(data.income) }}</td>
+                            <td>₹{{ "{:,.2f}".format(data.expense) }}</td>
+                            <td>₹{{ "{:,.2f}".format(data.net) }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
