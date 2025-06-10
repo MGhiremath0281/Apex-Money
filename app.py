@@ -113,8 +113,8 @@ def create_app():
         return db.session.get(User, int(user_id))
 
     with app.app_context():
-        # db.create_all() # UNCOMMENT THIS ONLY ONCE FOR INITIAL TABLE CREATION IF NOT USING MIGRATIONS, THEN COMMENT OUT AGAIN
-        pass
+         db.create_all() # UNCOMMENT THIS ONLY ONCE FOR INITIAL TABLE CREATION IF NOT USING MIGRATIONS, THEN COMMENT OUT AGAIN
+        
 
     # --- Routes ---
 
