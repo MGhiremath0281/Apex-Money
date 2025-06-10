@@ -21,18 +21,25 @@ import io
 import base64
 # --- End Plotting Imports ---
 
+# --- Load Environment Variables ---
+# IMPORTANT: This must be at the very top of your file
+from dotenv import load_dotenv
+load_dotenv()
+
 
 # --- Configuration ---
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'your_super_secret_key_here' # USE A STRONG, RANDOM KEY IN PRODUCTION
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'postgresql://finance_db_1rxc_user:gJXvzEaWaLvsClqJBnyJ3mSue24tbwOt@dpg-d13jgtvfte5s738qsk40-a/finance_db_1rxc'
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'your_super_secret_key_here'
+    # Use the DATABASE_URL environment variable provided by Render or your .env file
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG = os.environ.get('FLASK_DEBUG') == '1'
 
-# --- Database Initialization ---
+# --- Database & Extension Initialization (Global Instances) ---
+# Initialize these outside create_app, then attach them to the app inside create_app
 db = SQLAlchemy()
 migrate = Migrate()
+login_manager = LoginManager() # MOVED HERE: Initialize the LoginManager instance globally
 
 # --- Models ---
 class Base(db.Model):
@@ -103,22 +110,25 @@ def create_app():
     app = Flask(__name__, template_folder='templates', static_folder='static')
     app.config.from_object(Config)
 
+    # Initialize extensions with the app instance *inside* the factory
     db.init_app(app)
     migrate.init_app(app, db)
-
-    login_manager = LoginManager()
-    login_manager.login_view = 'login'
-    login_manager.init_app(app)
+    login_manager.login_view = 'login' # Configure login view here
+    login_manager.init_app(app) # Attach login_manager to the app
 
     @login_manager.user_loader
     def load_user(user_id):
         return db.session.get(User, int(user_id))
 
-    with app.app_context():
-         db.create_all() # UNCOMMENT THIS ONLY ONCE FOR INITIAL TABLE CREATION IF NOT USING MIGRATIONS, THEN COMMENT OUT AGAIN
-        
+    # --- REMOVED db.create_all() HERE ---
+    # This is handled by Flask-Migrate using 'flask db upgrade' in your Render Build Command.
+    # Running db.create_all() here in a deployment environment is not recommended.
+    # with app.app_context():
+    #      db.create_all()
 
     # --- Routes ---
+    # Moved all routes inside the create_app function so they are registered with the
+    # 'app' instance created by the factory.
 
     @app.route('/')
     def home():
@@ -165,24 +175,25 @@ def create_app():
             email = request.form.get('email')
             password = request.form.get('password')
 
-        if not username or not password:
-            flash('Username and password are required.', 'danger')
-            return render_template('register.html')
+            if not username or not password:
+                flash('Username and password are required.', 'danger')
+                return render_template('register.html')
 
-        user = User(username=username, email=email)
-        user.set_password(password)
+            user = User(username=username, email=email)
+            user.set_password(password)
 
-        try:
-            db.session.add(user)
-            db.session.commit()
-            flash('Registration successful. Please log in.', 'success')
-            return redirect(url_for('login'))
-        except IntegrityError:
-            db.session.rollback()
-            flash('Username or email already exists. Please choose another.', 'danger')
-            return render_template('register.html')
+            try:
+                db.session.add(user)
+                db.session.commit()
+                flash('Registration successful. Please log in.', 'success')
+                return redirect(url_for('login'))
+            except IntegrityError:
+                db.session.rollback()
+                flash('Username or email already exists. Please choose another.', 'danger')
+                return render_template('register.html')
+        # This return statement is for GET requests, so it renders the form initially
+        return render_template('register.html')
 
-    return render_template('register.html')
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():
@@ -444,15 +455,15 @@ def create_app():
             flash('Please add at least one expense category before creating a budget!', 'info')
             return redirect(url_for('add_category'))
 
-        today = datetime.now().date() # Add this line
+        today = datetime.now().date()
 
         if request.method == 'POST':
             try:
                 # Changed from category_id to category_name as per template
                 category_name = request.form['category_name'].strip()
                 amount = Decimal(request.form['amount'])
-                start_date_str = request.form['start_date'] # Now required by template
-                end_date_str = request.form.get('end_date') # Optional, will be None if not provided
+                start_date_str = request.form['start_date']
+                end_date_str = request.form.get('end_date')
 
                 if not category_name:
                     flash('Category name cannot be empty!', 'danger')
@@ -496,7 +507,7 @@ def create_app():
                 db.session.rollback()
                 flash(f'An error occurred: {e}', 'danger')
 
-        return render_template('budgets/add_budget.html', categories=categories, today=today) # Pass today here
+        return render_template('budgets/add_budget.html', categories=categories, today=today)
 
     @app.route('/budgets/edit/<int:budget_id>', methods=['GET', 'POST'])
     @login_required
@@ -506,10 +517,10 @@ def create_app():
 
         if request.method == 'POST':
             try:
-                category_name = request.form['category_name'].strip() # Corrected name
+                category_name = request.form['category_name'].strip()
                 amount = Decimal(request.form['amount'])
-                start_date_str = request.form['start_date'] # Added
-                end_date_str = request.form.get('end_date') # Added
+                start_date_str = request.form['start_date']
+                end_date_str = request.form.get('end_date')
 
                 if not category_name:
                     flash('Category name cannot be empty!', 'danger')
@@ -615,14 +626,17 @@ def create_app():
             category_total = db.session.query(func.sum(Transaction.amount)).filter(
                 Transaction.user_id == user_id,
                 Transaction.category_id == category.id,
+                Transaction.type == 'expense',
                 Transaction.date >= display_start_of_month,
                 Transaction.date < display_next_month
             ).scalar() or Decimal('0.00')
-            category_data.append({
-                'name': category.name,
-                'type': category.type,
-                'total': category_total
-            })
+            
+            if category_total > 0: # Only include categories with actual expenses
+                category_data.append({ # Corrected to append to category_data
+                    'name': category.name,
+                    'type': category.type,
+                    'total': category_total
+                })
 
         # Get current budgets for the SELECTED month
         current_budgets = Budget.query.filter(
@@ -658,6 +672,7 @@ def create_app():
         for i in range(12): # Loop for the last 12 months
             # Calculate the month for the current iteration (going backwards)
             # Use timedelta to move backward from the selected month
+            # Using pd.DateOffset requires pandas, ensure it's imported
             calc_date = display_start_of_month - pd.DateOffset(months=i)
             current_iter_month_start = calc_date.date().replace(day=1)
             next_iter_month_start = (current_iter_month_start + timedelta(days=32)).replace(day=1)
@@ -686,6 +701,7 @@ def create_app():
 
         # --- Plotly Graph Section: Expense Breakdown Pie Chart ---
         expense_breakdown_chart_data = []
+        # Re-fetch or use existing expense categories
         for category in expense_categories:
             category_expense_total = db.session.query(func.sum(Transaction.amount)).filter(
                 Transaction.user_id == user_id,
@@ -701,188 +717,143 @@ def create_app():
                     'amount': float(category_expense_total) # Convert Decimal to float for Plotly
                 })
 
-        expense_pie_chart_html = None
-        if expense_breakdown_chart_data:
-            df_expenses = pd.DataFrame(expense_breakdown_chart_data)
-            fig_pie = px.pie(
-                df_expenses, 
-                values='amount', 
-                names='category', 
-                title=f'Expense Breakdown for {display_start_of_month.strftime("%B %Y")}',
-                hole=0.3 # Creates a donut chart
+        # Create DataFrame for Plotly Pie Chart
+        expense_df = pd.DataFrame(expense_breakdown_chart_data)
+        expense_pie_chart = None
+        if not expense_df.empty:
+            expense_pie_chart = px.pie(
+                expense_df,
+                values='amount',
+                names='category',
+                title=f'Expense Breakdown ({display_start_of_month.strftime("%B %Y")})',
+                hole=0.3
             )
-            fig_pie.update_traces(textposition='inside', textinfo='percent+label')
-            fig_pie.update_layout(showlegend=True, margin=dict(t=50, b=0, l=0, r=0)) # Adjust margins
-            expense_pie_chart_html = fig_pie.to_html(full_html=False, include_plotlyjs='cdn')
-        # --- End Plotly Graph Section ---
+            expense_pie_chart.update_traces(textposition='inside', textinfo='percent+label')
+            expense_pie_chart = expense_pie_chart.to_html(full_html=False)
 
 
-        # --- Plotly Graph Section: Income vs Expense Trend (Last 12 Months) ---
-        income_expense_trend_chart_html = None
-        if monthly_data: # monthly_data should contain 'month', 'income', 'expense'
-            # Convert monthly_data to a DataFrame
-            df_trend = pd.DataFrame(monthly_data)
-            # Convert 'month' string to datetime objects for proper sorting and plotting
-            df_trend['month_dt'] = pd.to_datetime(df_trend['month'], format='%B %Y')
-            df_trend = df_trend.sort_values(by='month_dt') # Ensure data is sorted by month
+        # --- Plotly Graph Section: Monthly Trend Chart (Line Chart) ---
+        # Ensure monthly_data is a list of dictionaries as required
+        monthly_df = pd.DataFrame(monthly_data)
+        monthly_trend_chart = None
+        if not monthly_df.empty:
+            # Convert 'month' column to datetime objects for proper sorting and plotting
+            monthly_df['month_dt'] = pd.to_datetime(monthly_df['month'])
+            monthly_df = monthly_df.sort_values('month_dt')
 
-            fig_trend = go.Figure()
-            fig_trend.add_trace(go.Scatter(x=df_trend['month'], y=df_trend['income'], mode='lines+markers', name='Income', line=dict(color='green')))
-            fig_trend.add_trace(go.Scatter(x=df_trend['month'], y=df_trend['expense'], mode='lines+markers', name='Expense', line=dict(color='red')))
-
-            fig_trend.update_layout(
-                title=f'Income vs. Expense Trend (Last 12 Months from {display_start_of_month.strftime("%B %Y")})',
-                xaxis_title='Month',
-                yaxis_title='Amount (₹)',
-                hovermode='x unified',
-                margin=dict(t=50, b=0, l=0, r=0)
+            monthly_trend_chart = px.line(
+                monthly_df,
+                x='month',
+                y=['income', 'expense', 'net'], # Plot multiple lines
+                title='Monthly Financial Trend (Last 12 Months)',
+                labels={
+                    'month': 'Month',
+                    'value': 'Amount ($)',
+                    'variable': 'Type'
+                }
             )
-            income_expense_trend_chart_html = fig_trend.to_html(full_html=False, include_plotlyjs='cdn')
-        # --- End Plotly Graph Section ---
-
+            monthly_trend_chart.update_xaxes(tickangle=45)
+            monthly_trend_chart = monthly_trend_chart.to_html(full_html=False)
+        
+        # Determine available years for dropdown (e.g., from 2020 to current year + 1)
+        # You can adjust the range (e.g., max_year - 5 to max_year + 1)
+        min_year_in_data = db.session.query(func.min(Transaction.date)).scalar()
+        min_year = min_year_in_data.year if min_year_in_data else current_year - 5 # Fallback if no data
+        years_for_dropdown = list(range(min_year, current_year + 2)) # Current year + next year
 
         return render_template(
-            'reports/monthly_summary_report.html',
-            current_month=display_start_of_month, # The actual month being displayed
-            total_income=total_income_month,
-            total_expenses=total_expense_month,
-            net_savings=total_income_month - total_expense_month,
+            'reports/monthly_summary.html',
+            total_income_month=total_income_month,
+            total_expense_month=total_expense_month,
+            net_savings_month=total_income_month - total_expense_month,
             category_data=category_data,
             budget_summary=budget_summary,
-            monthly_data=monthly_data,          
-            current_year=current_year,          
-            selected_year=selected_year,        
+            monthly_data=monthly_data, # For the table display
+            expense_pie_chart=expense_pie_chart, # HTML for the pie chart
+            monthly_trend_chart=monthly_trend_chart, # HTML for the line chart
+            selected_year=selected_year,
             selected_month=selected_month,
-            # --- Pass the Plotly charts HTML to the template ---
-            expense_pie_chart_html=expense_pie_chart_html,
-            income_expense_trend_chart_html=income_expense_trend_chart_html
+            years_for_dropdown=years_for_dropdown,
+            months_for_dropdown=[
+                {'value': 1, 'name': 'January'}, {'value': 2, 'name': 'February'},
+                {'value': 3, 'name': 'March'}, {'value': 4, 'name': 'April'},
+                {'value': 5, 'name': 'May'}, {'value': 6, 'name': 'June'},
+                {'value': 7, 'name': 'July'}, {'value': 8, 'name': 'August'},
+                {'value': 9, 'name': 'September'}, {'value': 10, 'name': 'October'},
+                {'value': 11, 'name': 'November'}, {'value': 12, 'name': 'December'}
+            ]
         )
 
-    @app.route('/reports/expense_breakdown')
+    # --- Net Worth Report (New) ---
+    @app.route('/reports/net_worth')
     @login_required
-    def expense_breakdown_report():
+    def net_worth_report():
         user_id = current_user.id
-        today = datetime.now().date()
         
-        # 1. Get current year for dropdown range
-        current_year = today.year
+        # Fetch all transactions for the user
+        transactions = db.session.query(Transaction.date, Transaction.amount, Transaction.type).\
+            filter(Transaction.user_id == user_id).\
+            order_by(Transaction.date).all()
+        
+        if not transactions:
+            flash("No transactions recorded yet to calculate net worth. Add some transactions!", "info")
+            return render_template('reports/net_worth_report.html', net_worth_chart=None, current_net_worth=Decimal('0.00'))
 
-        # 2. Get selected filters from request args, default to current month/year, no specific category
-        selected_month = request.args.get('month', type=int, default=today.month)
-        selected_year = request.args.get('year', type=int, default=today.year)
-        selected_expense_category_id = request.args.get('expense_category_id', type=int) # Can be None if not selected
+        # Create a DataFrame for easier calculation
+        df = pd.DataFrame(transactions, columns=['date', 'amount', 'type'])
+        
+        # Convert amount to numeric and handle income/expense
+        df['amount'] = df.apply(lambda row: row['amount'] if row['type'] == 'income' else -row['amount'], axis=1)
+        
+        # Group by date and calculate cumulative sum
+        daily_balance = df.groupby('date')['amount'].sum().cumsum().reset_index()
+        daily_balance.columns = ['Date', 'Net Worth']
 
-        # 3. Define the date range for filtering based on selected month/year
-        try:
-            filter_start_date = date(selected_year, selected_month, 1)
-            filter_end_date = (filter_start_date + timedelta(days=32)).replace(day=1) - timedelta(days=1)
-        except ValueError:
-            # Fallback for invalid month/year combinations
-            flash("Invalid date selection. Showing current month's breakdown.", "warning")
-            filter_start_date = today.replace(day=1)
-            filter_end_date = (filter_start_date + timedelta(days=32)).replace(day=1) - timedelta(days=1)
-            selected_month = today.month
-            selected_year = today.year
+        # Ensure all dates from the start to the end of transactions are present for continuous line
+        # This handles days with no transactions
+        min_date = daily_balance['Date'].min()
+        max_date = daily_balance['Date'].max()
+        all_dates = pd.date_range(start=min_date, end=max_date, freq='D')
+        
+        # Create a full DataFrame with all dates
+        full_df = pd.DataFrame(all_dates, columns=['Date'])
+        full_df['Date'] = full_df['Date'].dt.date # Convert to date objects to match daily_balance
+        
+        # Merge the daily_balance with the full date range
+        merged_df = pd.df(full_df, on='Date', how='left')
+        
+        # Fill missing Net Worth values with the last valid observation
+        merged_df['Net Worth'] = merged_df['Net Worth'].fillna(method='ffill')
+        
+        # Fill leading NaNs (before first transaction) with 0 or initial balance if applicable
+        merged_df['Net Worth'] = merged_df['Net Worth'].fillna(0) # Assuming starting at 0 if no earlier data
 
-        # 4. Fetch all expense categories for the dropdown
-        all_expense_categories = Category.query.filter_by(user_id=user_id, type='expense').order_by(Category.name).all()
-
-        # 5. Build the query for transactions
-        transactions_query = Transaction.query.filter(
-            Transaction.user_id == user_id,
-            Transaction.type == 'expense',
-            Transaction.date >= filter_start_date,
-            Transaction.date <= filter_end_date
+        # Plotly Line Chart for Net Worth Trend
+        net_worth_chart = px.line(
+            merged_df,
+            x='Date',
+            y='Net Worth',
+            title='Net Worth Over Time',
+            labels={'Net Worth': 'Net Worth ($)', 'Date': 'Date'},
+            line_shape='linear' # or 'spline' for smoother lines
         )
-
-        # 6. Calculate category-wise totals
-        expense_breakdown_data = []
-        total_breakdown_expense = Decimal('0.00')
-
-        if selected_expense_category_id:
-            # If a specific category is selected, only show that category's data
-            specific_category = Category.query.get(selected_expense_category_id)
-            if specific_category and specific_category.user_id == user_id and specific_category.type == 'expense':
-                total_spent = transactions_query.filter(
-                    Transaction.category_id == selected_expense_category_id
-                ).with_entities(func.sum(Transaction.amount)).scalar() or Decimal('0.00')
-                expense_breakdown_data.append({
-                    'name': specific_category.name,
-                    'total_spent': total_spent
-                })
-                total_breakdown_expense = total_spent
-        else:
-            # Otherwise, group by all expense categories
-            for category in all_expense_categories:
-                # Get total spent for this category within the filtered date range
-                spent_in_category = transactions_query.filter(
-                    Transaction.category_id == category.id
-                ).with_entities(func.sum(Transaction.amount)).scalar() or Decimal('0.00')
-
-                if spent_in_category > 0: # Only add categories with expenses
-                    expense_breakdown_data.append({
-                        'name': category.name,
-                        'total_spent': spent_in_category
-                    })
-                total_breakdown_expense += spent_in_category
-
-        # 7. Sort the breakdown data (e.g., by total spent descending)
-        expense_breakdown_data.sort(key=lambda x: x['total_spent'], reverse=True)
-
-        # --- Matplotlib Graph Section: Expense Breakdown Bar Chart ---
-        expense_bar_chart_b64 = None
-        if expense_breakdown_data:
-            categories = [d['name'] for d in expense_breakdown_data]
-            amounts = [float(d['total_spent']) for d in expense_breakdown_data] # Convert Decimal to float
-
-            fig, ax = plt.subplots(figsize=(10, 6)) # Adjust figure size as needed
-            ax.bar(categories, amounts, color='skyblue')
-            ax.set_ylabel('Amount (₹)')
-            ax.set_title(f'Expense Breakdown ({filter_start_date.strftime("%B %Y")})')
-            plt.xticks(rotation=45, ha='right') # Rotate labels if they overlap
-            plt.tight_layout() # Adjust layout to prevent labels from being cut off
-
-            # Save plot to a BytesIO object (in-memory file)
-            buffer = io.BytesIO()
-            plt.savefig(buffer, format='png', bbox_inches='tight')
-            buffer.seek(0)
-            plt.close(fig) # Close the figure to free up memory
-
-            # Encode to Base64
-            expense_bar_chart_b64 = base64.b64encode(buffer.getvalue()).decode()
-        # --- End Matplotlib Graph Section ---
-
-
-        return render_template(
-            'reports/expense_breakdown_report.html',
-            current_month=filter_start_date, # This reflects the start of the selected month
-            total_breakdown_expense=total_breakdown_expense, # Total for the period and filters
-            expense_breakdown_data=expense_breakdown_data,   # Category-wise breakdown
-            current_year=current_year,                       # For the year dropdown range
-            selected_year=selected_year,                     # To pre-select year in dropdown
-            selected_month=selected_month,                   # To pre-select month in dropdown
-            all_expense_categories=all_expense_categories,   # To populate category dropdown
-            selected_expense_category_id=selected_expense_category_id, # To pre-select category
-            # --- Pass the Base64 image to the template ---
-            expense_bar_chart_b64=expense_bar_chart_b64
+        net_worth_chart.update_xaxes(
+            rangeslider_visible=True,
+            rangeselector=dict(
+                buttons=list([
+                    dict(count=1, label="1m", step="month", stepmode="backward"),
+                    dict(count=6, label="6m", step="month", stepmode="backward"),
+                    dict(count=1, label="YTD", step="year", stepmode="todate"),
+                    dict(count=1, label="1y", step="year", stepmode="backward"),
+                    dict(step="all")
+                ])
+            )
         )
+        net_worth_chart.update_layout(hovermode="x unified")
+        net_worth_chart_html = net_worth_chart.to_html(full_html=False)
 
-    # --- Error Handlers ---
-    @app.errorhandler(404)
-    def page_not_found(e):
-        return render_template('errors/404.html'), 404
+        current_net_worth = merged_df['Net Worth'].iloc[-1] if not merged_df.empty else Decimal('0.00')
 
-    @app.errorhandler(500)
-    def internal_server_error(e):
-        db.session.rollback()
-        return render_template('errors/500.html'), 500
+        return render_template('reports/net_worth_report.html', net_worth_chart=net_worth_chart_html, current_net_worth=current_net_worth)
 
-    return app
-
-# --- Run the application directly if this script is executed ---
-if __name__ == '__main__':
-    from dotenv import load_dotenv
-    load_dotenv()
-
-    app = create_app()
-    app.run(debug=True)
+    return app # IMPORTANT: Return the app instance from the factory
