@@ -2,13 +2,14 @@
 
 import os
 from flask import Flask, render_template, request, flash, redirect, url_for, Blueprint
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy,
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta, date
 from sqlalchemy import func
 from decimal import Decimal
 from flask_migrate import Migrate
+from sqlalchemy.exc import IntegrityError
 
 # --- Imports for Plotting ---
 import plotly.express as px
@@ -157,31 +158,30 @@ def create_app():
 
     # --- Authentication Routes ---
     @app.route('/register', methods=['GET', 'POST'])
-    def register():
-        if current_user.is_authenticated:
-            return redirect(url_for('dashboard_page'))
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
 
-        if request.method == 'POST':
-            username = request.form.get('username')
-            email = request.form.get('email')
-            password = request.form.get('password')
+        if not username or not password:
+            flash('Username and password are required.', 'danger')
+            return render_template('register.html')
 
-            if not username or not password:
-                flash('Username and password are required!', 'danger')
-                return redirect(url_for('register'))
+        user = User(username=username, email=email)
+        user.set_password(password)
 
-            user = User.query.filter_by(username=username).first()
-            if user:
-                flash('Username already taken!', 'danger')
-                return redirect(url_for('register'))
-
-            new_user = User(username=username, email=email)
-            new_user.set_password(password)
-            db.session.add(new_user)
+        try:
+            db.session.add(user)
             db.session.commit()
-            flash('Account created successfully! Please log in.', 'success')
+            flash('Registration successful. Please log in.', 'success')
             return redirect(url_for('login'))
-        return render_template('auth/register.html')
+        except IntegrityError:
+            db.session.rollback()
+            flash('Username or email already exists. Please choose another.', 'danger')
+            return render_template('register.html')
+
+    return render_template('register.html')
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():
